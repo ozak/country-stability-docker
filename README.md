@@ -1,5 +1,5 @@
 # Docker for replication environments
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ozak/stata-jupyter-docker/HEAD)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ozak/country-stability-docker/HEAD)
 
 This repository creates a docker file with stata and jupyter.
 
