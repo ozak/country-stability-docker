@@ -39,16 +39,20 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set date variable
+        id: vars
+        run: echo "DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
+
       - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
           images: |
-            omerozak/econgrowth-deepnote-binder
+            omerozak/country-stability-docker
             ghcr.io/${{ github.repository }}
           tags: |
             type=ref,event=branch
-            type=raw,value=${{ github.ref_name }}-$(date +'%Y%m%d')
+            type=raw,value=${{ github.ref_name }}-${{ env.DATE }}
 
       - name: Build and push Docker images
         uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
