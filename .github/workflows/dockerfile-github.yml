@@ -27,13 +27,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Log in to Docker Hub
-        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Log in to the Container registry
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -41,23 +41,27 @@ jobs:
 
       - name: Set date variable
         id: vars
-        run: echo "DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
-
+        run: |
+          echo "DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
+          REPO_NAME=$(echo "${GITHUB_REPOSITORY#*/}" | tr '[:upper:]' '[:lower:]')
+          echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV
+          echo "Repository name in lowercase is: $REPO_NAME"  # Print REPO_NAME to log for debugging
+          
       - name: Extract metadata (tags, labels) for Docker
         id: meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        uses: docker/metadata-action@v4
         with:
           images: |
-            omerozak/country-stability-docker
-            ghcr.io/${{ github.repository }}
+            omerozak/${{ env.REPO_NAME }}
+            ghcr.io/${{ env.REPO_NAME }}
           tags: |
-            type=ref,event=branch
             type=raw,value=${{ github.ref_name }}-${{ env.DATE }}
 
       - name: Build and push Docker images
-        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+        uses: docker/build-push-action@v3
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: |
+            omerozak/${{ env.REPO_NAME }}:${{ github.ref_name }}-${{ env.DATE }}
           labels: ${{ steps.meta.outputs.labels }}
